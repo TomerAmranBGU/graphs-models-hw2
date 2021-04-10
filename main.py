@@ -62,3 +62,21 @@ def Ztemp_ys(Temp, size):
             inner_res *= F(yS[i],yS[i+1],Temp)
         res += inner_res
     return res
+
+
+# Exercise 7
+def get_Ts(size, Temp):
+    Ts = []
+    y_range = range(2**size)
+    T1 = [sum([G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp) for y1 in y_range]) \
+                            for y2 in y_range]
+    Ts.append(T1)
+    Tprev = T1
+    for _ in range(1,size-1):
+        Tnext = [sum([Tprev[y1]*G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp)for y1 in y_range]) \
+                            for y2 in y_range]
+        Ts.append(Tnext)
+        Tprev = Tnext
+    Tlast = sum([Tprev[y]*G(y2row(y,size),Temp) for y in y_range])
+    Ts.append(Tlast)
+    return Ts
