@@ -68,15 +68,50 @@ def Ztemp_ys(Temp, size):
 def get_Ts(size, Temp):
     Ts = []
     y_range = range(2**size)
-    T1 = [sum([G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp) for y1 in y_range]) \
+    T1 = [sum([G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp) \
+                        for y1 in y_range]) \
                             for y2 in y_range]
     Ts.append(T1)
     Tprev = T1
     for _ in range(1,size-1):
-        Tnext = [sum([Tprev[y1]*G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp)for y1 in y_range]) \
+        Tnext = [sum([Tprev[y1]*G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp) \
+                        for y1 in y_range]) \
                             for y2 in y_range]
         Ts.append(Tnext)
         Tprev = Tnext
     Tlast = sum([Tprev[y]*G(y2row(y,size),Temp) for y in y_range])
     Ts.append(Tlast)
     return Ts
+
+def get_ps(size, Temp, Ts):
+    y_range = range(2**size)
+    Ztemp = Ts[-1]
+    ps = []
+    p_first = lambda y: Ts[-2][y]*G(y2row(y,size),Temp)/Ztemp
+    ps.append(p_first)
+    p_prev = p_first
+    for i in range(size-2, 0, -1):
+        p_next = lambda y1,y2: Ts[i-1][y1]* G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp) \
+              / Ts[i][y2]
+        ps.append(p_next)
+        p_prev = p_next
+    p_last = lambda y1,y2: G(y2row(y1,size),Temp)*F(y2row(y1,size),y2row(y2,size),Temp) / Ts[0][y2]
+    ps.append(p_last)
+    return ps
+# def sample_lattice(size, Temp, Ts):
+
+def sample(size, Temp):
+    Ts = get_Ts(size, Temp)
+    ps = get_ps(size, Temp, Ts)
+    sample = []
+    y_range = range(2**size)
+    y_first = np.random.choice(y_range, p=[ps[0](y) for y in y_range])
+    sample.append(y_first)
+    y_prev = y_first
+    for i in range(1,size):
+        y_next =  np.random.choice(y_range, p=[ps[i](y, y_prev) for y in y_range])
+        sample.append(y_next)
+        y_prev = y_next
+    #no need for last
+    parsed_sample = np.array([np.array(y2row(y,size)) for y in sample])
+    return parsed_sample
