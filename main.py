@@ -100,9 +100,9 @@ def get_ps(size, Temp, Ts):
     return ps
 # def sample_lattice(size, Temp, Ts):
 
-def sample(size, Temp):
-    Ts = get_Ts(size, Temp)
-    ps = get_ps(size, Temp, Ts)
+def sample(size, Temp, Ts, ps):
+    # Ts = get_Ts(size, Temp)
+    # ps = get_ps(size, Temp, Ts)
     sample = []
     y_range = range(2**size)
     y_first = np.random.choice(y_range, p=[ps[0](y) for y in y_range])
@@ -115,3 +115,12 @@ def sample(size, Temp):
     #no need for last
     parsed_sample = np.array([np.array(y2row(y,size)) for y in sample])
     return parsed_sample
+
+def sample_n(n, size, Temp):
+    Ts = get_Ts(size, Temp)
+    ps = get_ps(size, Temp, Ts)
+    samples = []
+    for i in range(n):
+        samples.append(sample(size,Temp, Ts, ps))
+    return samples
+
