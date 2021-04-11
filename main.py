@@ -1,5 +1,6 @@
 import numpy as np
 import itertools
+import matplotlib.pyplot as plt
 # Exercise 1
 def G(row_s, Temp):
     return np.exp(1/Temp * row_s[:-1]@row_s[1:].T)
@@ -123,4 +124,3 @@ def sample_n(n, size, Temp):
     for i in range(n):
         samples.append(sample(size,Temp, Ts, ps))
     return samples
-
